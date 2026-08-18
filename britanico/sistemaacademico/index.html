@@ -1,1 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA ACADÉMICO LP v2.0.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        :root { --primary: #6366f1; --primary-hover: #4f46e5; --bg-main: #fcfdfe; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: #1e293b; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-item { transition: all 0.2s ease; cursor: pointer; }
+        .sidebar-item.active { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+        .glass-card { background: white; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); border-color: #e2e8f0; }
+        .score-input { transition: all 0.2s ease; border: 2px solid transparent; }
+        .score-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); outline: none; }
+        .search-results-popover { max-height: 300px; overflow-y: auto; z-index: 100; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen flex overflow-hidden">
 
+    <aside class="w-72 bg-white border-r border-slate-100 flex flex-col h-screen z-50">
+        <div class="p-8">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                    <i class="fas fa-layer-group text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-slate-900">SISTEMA LP</h1>
+                    <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.2em]">Versión 2.0.0</span>
+                </div>
+            </div>
+            <div class="relative mb-6">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fas fa-search text-xs"></i></div>
+                <input type="text" id="global-search" oninput="handleGlobalSearch()" placeholder="Buscar estudiante..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold outline-none">
+                <div id="global-results" class="hidden absolute top-full left-0 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl search-results-popover"></div>
+            </div>
+        </div>
+        <nav class="flex-1 px-6 space-y-2 overflow-y-auto">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-4">Menú</p>
+            <button onclick="showSection('institutions')" id="nav-institutions" class="sidebar-item active w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-sm"><i class="fas fa-university w-5"></i> Instituciones</button>
+            <button onclick="showSection('reports')" id="nav-reports" class="sidebar-item w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50"><i class="fas fa-chart-pie w-5"></i> Reportes</button>
+        </nav>
+        <div class="p-6 border-t border-slate-50 space-y-3">
+            <button onclick="importJSON()" class="w-full bg-slate-50 text-slate-600 py-4 rounded-2xl font-bold text-[11px] flex items-center justify-center gap-3 border border-slate-100 uppercase tracking-widest"><i class="fas fa-file-import text-indigo-500"></i> Importar</button>
+            <button onclick="exportJSON()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-[11px] flex items-center justify-center gap-3 shadow-xl uppercase tracking-widest"><i class="fas fa-cloud-download-alt"></i> Backup</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-screen overflow-y-auto relative flex flex-col bg-slate-50/50">
+        <div class="p-8 md:p-12 flex-1 pb-24">
+            
+            <section id="section-institutions" class="view-section active">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Mis Instituciones</h2>
+                        <p class="text-slate-500 font-medium">Gestiona tus unidades educativas y registros desde la nube.</p>
+                    </div>
+                    <button onclick="openModal('institution')" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl flex items-center justify-center gap-3"><i class="fas fa-plus-circle"></i> Nueva Institución</button>
+                </div>
+                <div id="grid-institutions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            </section>
+
+            <section id="section-reports" class="view-section">
+                <div class="mb-12">
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Análisis de Rendimiento</h2>
+                    <p class="text-slate-500 font-medium">Estadísticas basadas en la nota sobre 100 puntos.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <div class="flex items-center gap-4 mb-8"><div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center"><i class="fas fa-trophy"></i></div><h3 class="text-xl font-black text-slate-800">Excelencia Académica</h3></div>
+                        <div id="list-top-students" class="space-y-4"></div>
+                    </div>
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <div class="flex items-center gap-4 mb-8"><div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center"><i class="fas fa-exclamation-triangle"></i></div><h3 class="text-xl font-black text-slate-800">Atención Necesaria</h3></div>
+                        <div id="list-low-students" class="space-y-4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-classrooms" class="view-section">
+                <div class="flex items-center gap-6 mb-12">
+                    <button onclick="showSection('institutions')" class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600"><i class="fas fa-chevron-left"></i></button>
+                    <div><h2 id="title-inst" class="text-4xl font-black text-slate-900 uppercase">Cargando...</h2><p class="text-indigo-500 font-bold text-xs uppercase tracking-widest">Cursos</p></div>
+                    <button onclick="openModal('classroom')" class="ml-auto bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-lg flex items-center gap-3"><i class="fas fa-plus"></i> Nuevo Curso</button>
+                </div>
+                <div id="grid-classrooms" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <section id="section-trimestres" class="view-section">
+                <div class="flex items-center gap-6 mb-12">
+                    <button onclick="showSection('classrooms')" class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400"><i class="fas fa-chevron-left"></i></button>
+                    <h2 id="title-class-tr" class="text-4xl font-black text-slate-900 uppercase">Aula</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mt-12">
+                    <button onclick="selectTrimestre(1)" class="glass-card group p-12 rounded-[3rem] text-center"><div class="w-20 h-20 bg-amber-50 rounded-3xl flex items-center justify-center mx-auto mb-6"><span class="text-4xl font-bold">1</span></div><h3 class="text-xl font-black text-slate-800">PRIMER TRIMESTRE</h3></button>
+                    <button onclick="selectTrimestre(2)" class="glass-card group p-12 rounded-[3rem] text-center"><div class="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto mb-6"><span class="text-4xl font-bold">2</span></div><h3 class="text-xl font-black text-slate-800">SEGUNDO TRIMESTRE</h3></button>
+                    <button onclick="selectTrimestre(3)" class="glass-card group p-12 rounded-[3rem] text-center"><div class="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6"><span class="text-4xl font-bold">3</span></div><h3 class="text-xl font-black text-slate-800">TERCER TRIMESTRE</h3></button>
+                </div>
+            </section>
+
+            <section id="section-students" class="view-section">
+                <div class="flex flex-col gap-8 mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center gap-6">
+                        <button onclick="showSection('trimestres')" class="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400"><i class="fas fa-chevron-left"></i></button>
+                        <div class="flex-1"><h2 id="title-class-sheet" class="text-3xl font-black text-slate-900 uppercase">Planilla</h2><p id="info-tr-active" class="text-xs text-indigo-500 font-black uppercase tracking-widest mt-1"></p></div>
+                        <div class="flex gap-4">
+                            <input type="text" id="search-student" oninput="renderStudents()" placeholder="Filtrar en tabla..." class="px-6 py-4 bg-white border border-slate-100 rounded-2xl text-sm font-semibold outline-none w-full md:w-64">
+                            <button onclick="openModal('student')" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl">Inscribir Estudiante</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse min-w-[900px]">
+                            <thead>
+                                <tr class="bg-slate-50/50 border-b border-slate-50 text-slate-400 font-black uppercase tracking-widest">
+                                    <th class="px-8 py-6">Estudiante</th>
+                                    <th class="px-4 py-6 text-center">Ser (10)</th>
+                                    <th class="px-4 py-6 text-center">Saber (45)</th>
+                                    <th class="px-4 py-6 text-center">Hacer (40)</th>
+                                    <th class="px-4 py-6 text-center">Autoevaluación (5)</th>
+                                    <th class="px-4 py-6 text-center bg-slate-100/50 text-slate-900">Total (100)</th>
+                                    <th class="px-8 py-6 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-students" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="bg-white/80 backdrop-blur-md border-t border-slate-50 py-4 px-12 flex justify-between items-center absolute bottom-0 w-full z-40">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">© 2026 LP ACADÉMICO</span>
+            <div class="flex items-center gap-3">
+                <button onclick="fetchFromCloud()" title="Forzar Sincronización Completa" class="text-slate-400 hover:text-indigo-600 transition-colors text-xs"><i class="fas fa-sync-alt"></i></button>
+                <div class="flex items-center gap-2"><div id="sync-indicator-dot" class="w-2 h-2 rounded-full bg-emerald-500"></div><span id="sync-indicator-text" class="text-[9px] font-bold text-slate-400 uppercase">Sincronizado</span></div>
+            </div>
+        </footer>
+    </main>
+
+    <div id="modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-md rounded-[3rem] p-12 shadow-2xl">
+            <h3 id="modal-title" class="text-2xl font-black text-slate-900 text-center mb-8">Nuevo Registro</h3>
+            <input type="hidden" id="edit-id">
+            <div class="space-y-6 mb-10">
+                <input type="text" id="input-name" placeholder="Nombre Completo / Descripción" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold">
+                <div id="code-field" class="hidden"><input type="text" id="input-code" placeholder="RUDE / Código" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold"></div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Cerrar</button>
+                <button id="modal-save" class="flex-2 bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-import" class="hidden" accept=".json" onchange="processFile(event)">
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxAughLFFvep2dzqIRd2dWxaeab6LRt0U7YHWFEPkL6PmoE3ewF5n6FnuOpIrZmdZrlrg/exec";
+        let appData = { institutions: [] };
+        let curInstId = null, curClassId = null, curTrimestre = 1;
+
+        window.onload = async () => {
+            const saved = localStorage.getItem('pedagogico_lp_v20');
+            if (saved) { try { appData = JSON.parse(saved); } catch(e){} }
+            renderInstitutions();
+            // Trae forzosamente todo el árbol estructurado del Sheets sin basarse solo en cachés locales
+            await fetchFromCloud();
+        };
+
+        function saveData() { 
+            localStorage.setItem('pedagogico_lp_v20', JSON.stringify(appData)); 
+            saveToCloud();
+        }
+
+        async function fetchFromCloud() {
+            setSyncStatus('syncing', 'Descargando base de datos completa...');
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                if (data && data.institutions) {
+                    appData = data;
+                    localStorage.setItem('pedagogico_lp_v20', JSON.stringify(appData));
+                    refreshCurrentView();
+                    setSyncStatus('success', 'Sincronización Total Exitosa');
+                }
+            } catch (error) {
+                setSyncStatus('error', 'Modo Local (Sin conexión)');
+            }
+        }
+
+        async function saveToCloud() {
+            setSyncStatus('syncing', 'Actualizando Nube...');
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(appData)
+                });
+                setSyncStatus('success', 'Guardado en Google Sheets');
+            } catch (error) {
+                setSyncStatus('error', 'Error al Guardar en Nube');
+            }
+        }
+
+        function setSyncStatus(state, message) {
+            const dot = document.getElementById('sync-indicator-dot');
+            const text = document.getElementById('sync-indicator-text');
+            if (!dot || !text) return;
+            text.innerText = message;
+            dot.className = "w-2 h-2 rounded-full " + (state === 'syncing' ? 'bg-amber-500 animate-pulse' : state === 'success' ? 'bg-emerald-500' : 'bg-rose-500');
+        }
+
+        function refreshCurrentView() {
+            if (document.getElementById('section-institutions').classList.contains('active')) renderInstitutions();
+            if (document.getElementById('section-reports').classList.contains('active')) renderReports();
+            if (document.getElementById('section-classrooms').classList.contains('active')) renderClassrooms();
+            if (document.getElementById('section-students').classList.contains('active')) renderStudents();
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section-${id}`).classList.add('active');
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            if(document.getElementById(`nav-${id}`)) document.getElementById(`nav-${id}`).classList.add('active');
+            if(id === 'institutions') renderInstitutions();
+            if(id === 'reports') renderReports();
+        }
+
+        function handleGlobalSearch() {
+            const query = document.getElementById('global-search').value.toLowerCase();
+            const resultsDiv = document.getElementById('global-results');
+            if (query.length < 2) { resultsDiv.classList.add('hidden'); return; }
+            let matches = [];
+            appData.institutions.forEach(inst => {
+                inst.classrooms.forEach(cls => {
+                    cls.students.forEach(std => {
+                        if (std.name.toLowerCase().includes(query)) matches.push({ std, cls, inst });
+                    });
+                });
+            });
+            if (matches.length > 0) {
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.innerHTML = matches.map(m => `
+                    <div onclick="goToStudent(${m.inst.id}, ${m.cls.id}, ${m.std.id})" class="p-4 hover:bg-indigo-50 cursor-pointer border-b border-slate-50 last:border-0">
+                        <div class="font-black text-slate-800 text-[11px] uppercase">${m.std.name}</div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase">${m.inst.name} • ${m.cls.name}</div>
+                    </div>
+                `).join('');
+            } else { resultsDiv.innerHTML = '<div class="p-4 text-[10px] text-slate-400 text-center uppercase">No encontrado</div>'; }
+        }
+
+        function goToStudent(instId, classId, stdId) {
+            curInstId = instId; curClassId = classId;
+            document.getElementById('global-results').classList.add('hidden');
+            document.getElementById('global-search').value = '';
+            openTrimestres(classId); selectTrimestre(1);
+            const inst = appData.institutions.find(i => i.id === instId);
+            const cls = inst.classrooms.find(c => c.id === classId);
+            document.getElementById('search-student').value = cls.students.find(s => s.id === stdId).name;
+            renderStudents();
+        }
+
+        function calculateAverage(std) {
+            if (!std.scores) return 0;
+            let totalGeneral = 0, count = 0;
+            [1, 2, 3].forEach(t => {
+                const s = std.scores[t];
+                if (s) {
+                    totalGeneral += (Number(s.ser)||0) + (Number(s.saber)||0) + (Number(s.hacer)||0) + (Number(s.auto)||Number(s.decidir)||0);
+                    count++;
+                }
+            });
+            return count > 0 ? (totalGeneral / count).toFixed(1) : 0;
+        }
+
+        function renderReports() {
+            let allStudents = [];
+            appData.institutions.forEach(inst => {
+                inst.classrooms.forEach(cls => {
+                    cls.students.forEach(std => {
+                        allStudents.push({ name: std.name, avg: parseFloat(calculateAverage(std)), inst: inst.name, cls: cls.name });
+                    });
+                });
+            });
+            const top = [...allStudents].sort((a, b) => b.avg - a.avg).slice(0, 5);
+            const low = [...allStudents].filter(s => s.avg > 0).sort((a, b) => a.avg - b.avg).slice(0, 5);
+            document.getElementById('list-top-students').innerHTML = top.map((s, i) => `
+                <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center font-black text-emerald-500 text-xs shadow-sm">${i+1}</div>
+                    <div class="flex-1"><div class="font-black text-slate-800 text-sm uppercase">${s.name}</div><div class="text-[9px] text-slate-400 font-bold uppercase">${s.inst} • ${s.cls}</div></div>
+                    <div class="text-xl font-black text-emerald-600">${s.avg}</div>
+                </div>
+            `).join('') || '<p class="text-center text-slate-400 font-bold py-10 text-xs">Sin datos</p>';
+            document.getElementById('list-low-students').innerHTML = low.map((s, i) => `
+                <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center font-black text-rose-500 text-xs shadow-sm">${i+1}</div>
+                    <div class="flex-1"><div class="font-black text-slate-800 text-sm uppercase">${s.name}</div><div class="text-[9px] text-slate-400 font-bold uppercase">${s.inst} • ${s.cls}</div></div>
+                    <div class="text-xl font-black text-rose-600">${s.avg}</div>
+                </div>
+            `).join('') || '<p class="text-center text-slate-400 font-bold py-10 text-xs">Sin datos</p>';
+        }
+
+        function renderInstitutions() {
+            const container = document.getElementById('grid-institutions');
+            if(!container) return;
+            container.innerHTML = appData.institutions.map(inst => `
+                <div onclick="openInst(${inst.id})" class="glass-card p-10 rounded-[2.5rem] cursor-pointer group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="event.stopPropagation(); editItem('institution', ${inst.id})" class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fas fa-pencil-alt text-[10px]"></i></button>
+                        <button onclick="event.stopPropagation(); deleteItem('inst', ${inst.id})" class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center"><i class="fas fa-trash text-[10px]"></i></button>
+                    </div>
+                    <div class="w-16 h-16 bg-indigo-600 text-white rounded-3xl flex items-center justify-center mb-8 shadow-lg"><i class="fas fa-university text-xl"></i></div>
+                    <h3 class="font-black text-xl text-slate-800 mb-2">${inst.name}</h3>
+                    <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">${inst.classrooms ? inst.classrooms.length : 0} CURSOS</p>
+                </div>
+            `).join('') || `<div class="col-span-full py-20 text-center text-slate-300 font-bold uppercase text-xs">No hay instituciones</div>`;
+        }
+
+        function openInst(id) { curInstId = id; const inst = appData.institutions.find(i => i.id === id); document.getElementById('title-inst').innerText = inst.name; renderClassrooms(); showSection('classrooms'); }
+
+        function renderClassrooms() {
+            const inst = appData.institutions.find(i => i.id === curInstId);
+            const container = document.getElementById('grid-classrooms');
+            if(!inst || !container) return;
+            container.innerHTML = inst.classrooms.map(cls => `
+                <div onclick="openTrimestres(${cls.id})" class="glass-card p-8 rounded-3xl cursor-pointer flex items-center gap-6 group">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center font-black text-xl group-hover:bg-indigo-50 group-hover:text-indigo-600">${cls.name.charAt(0)}</div>
+                    <div class="flex-1"><h3 class="font-black text-slate-800 uppercase text-base">${cls.name}</h3><p class="text-[9px] text-slate-400 font-black uppercase mt-1">${cls.students?.length || 0} Estudiantes</p></div>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="event.stopPropagation(); editItem('classroom', ${cls.id})" class="text-slate-300 hover:text-amber-500"><i class="fas fa-edit"></i></button>
+                        <button onclick="event.stopPropagation(); deleteItem('class', ${cls.id})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('') || `<div class="col-span-full text-center py-10 text-slate-300 font-bold text-[10px] uppercase">Vacío</div>`;
+        }
+
+        function openTrimestres(id) { curClassId = id; const cls = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === id); document.getElementById('title-class-tr').innerText = cls.name; showSection('trimestres'); }
+
+        function selectTrimestre(num) { curTrimestre = num; const inst = appData.institutions.find(i => i.id === curInstId); const cls = inst.classrooms.find(c => c.id === curClassId); document.getElementById('title-class-sheet').innerText = cls.name; document.getElementById('info-tr-active').innerText = `${num}ER TRIMESTRE • ${inst.name}`; renderStudents(); showSection('students'); }
+
+        function renderStudents() {
+            const cls = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === curClassId);
+            const query = document.getElementById('search-student').value.toLowerCase();
+            const container = document.getElementById('list-students');
+            if(!cls || !container) return;
+            const filtered = cls.students.filter(s => s.name.toLowerCase().includes(query)).sort((a,b) => a.name.localeCompare(b.name));
+            container.innerHTML = filtered.map(std => {
+                const scores = std.scores ? (std.scores[curTrimestre] || { ser:"", saber:"", hacer:"", auto:"" }) : { ser:"", saber:"", hacer:"", auto:"" };
+                // Soporte para leer registros antiguos de la columna 'decidir' y mapearlos automáticamente a 'auto'
+                if (scores.decidir !== undefined && (scores.auto === "" || scores.auto === undefined)) { scores.auto = scores.decidir; }
+                const total = (Number(scores.ser) || 0) + (Number(scores.saber) || 0) + (Number(scores.hacer) || 0) + (Number(scores.auto) || 0);
+                return `
+                <tr class="hover:bg-slate-50/50">
+                    <td class="px-8 py-5"><div class="font-black text-slate-800 uppercase text-sm">${std.name}</div><div class="text-[9px] text-slate-400 font-black mt-1">${std.code || 'SIN RUDE'}</div></td>
+                    <td class="px-2 py-5"><input type="number" min="0" max="10" onchange="updateScore(${std.id}, 'ser', this.value)" value="${scores.ser}" class="score-input w-14 mx-auto block text-center py-2.5 rounded-xl bg-amber-50/50 text-amber-700 font-black"></td>
+                    <td class="px-2 py-5"><input type="number" min="0" max="45" onchange="updateScore(${std.id}, 'saber', this.value)" value="${scores.saber}" class="score-input w-14 mx-auto block text-center py-2.5 rounded-xl bg-blue-50/50 text-blue-700 font-black"></td>
+                    <td class="px-2 py-5"><input type="number" min="0" max="40" onchange="updateScore(${std.id}, 'hacer', this.value)" value="${scores.hacer}" class="score-input w-14 mx-auto block text-center py-2.5 rounded-xl bg-emerald-50/50 text-emerald-700 font-black"></td>
+                    <td class="px-2 py-5"><input type="number" min="0" max="5" onchange="updateScore(${std.id}, 'auto', this.value)" value="${scores.auto}" class="score-input w-14 mx-auto block text-center py-2.5 rounded-xl bg-purple-50/50 text-purple-700 font-black"></td>
+                    <td class="px-4 py-5 text-center bg-slate-50/80"><span class="inline-block px-3 py-1 rounded-lg font-black text-base ${total < 51 ? 'text-rose-500 bg-rose-50' : 'text-slate-900 bg-slate-100'}">${total}</span></td>
+                    <td class="px-8 py-5 text-right"><div class="flex gap-3 justify-end"><button onclick="editItem('student', ${std.id})" class="text-slate-400 hover:text-amber-600"><i class="fas fa-pencil-alt text-xs"></i></button><button onclick="deleteItem('student', ${std.id})" class="text-slate-400 hover:text-rose-600"><i class="fas fa-trash text-xs"></i></button></div></td>
+                </tr>`
+            }).join('');
+        }
+
+        function updateScore(stdId, field, val) {
+            const cls = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === curClassId);
+            const std = cls.students.find(s => s.id === stdId);
+            if(!std.scores) std.scores = {};
+            if(!std.scores[curTrimestre]) std.scores[curTrimestre] = { ser:"", saber:"", hacer:"", auto:"" };
+            
+            let num = val === "" ? "" : parseInt(val);
+            if(num !== "") {
+                const limits = { ser: 10, saber: 45, hacer: 40, auto: 5 };
+                if(num > limits[field]) num = limits[field];
+                if(num < 0) num = 0;
+            }
+            std.scores[curTrimestre][field] = num;
+            saveData(); renderStudents();
+        }
+
+        function openModal(type, id = null) {
+            const modal = document.getElementById('modal');
+            const codeField = document.getElementById('code-field');
+            const nameInput = document.getElementById('input-name');
+            const codeInput = document.getElementById('input-code');
+            modal.classList.remove('hidden');
+            codeField.classList.toggle('hidden', type !== 'student');
+            nameInput.value = ''; codeInput.value = '';
+
+            if(id) {
+                let item;
+                if(type === 'institution') item = appData.institutions.find(i => i.id === id);
+                else if(type === 'classroom') item = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === id);
+                else { item = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === curClassId).students.find(s => s.id === id); codeInput.value = item.code || ''; }
+                nameInput.value = item.name;
+            }
+
+            document.getElementById('modal-save').onclick = () => {
+                const name = nameInput.value.trim(), code = codeInput.value.trim();
+                if(!name) return;
+                if(id) {
+                    let item;
+                    if(type === 'institution') item = appData.institutions.find(i => i.id === id);
+                    else if(type === 'classroom') item = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === id);
+                    else { item = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === curClassId).students.find(s => s.id === id); item.code = code; }
+                    item.name = name;
+                } else {
+                    const newId = Date.now();
+                    if(type === 'institution') appData.institutions.push({ id: newId, name, classrooms: [] });
+                    else if(type === 'classroom') appData.institutions.find(i => i.id === curInstId).classrooms.push({ id: newId, name, students: [] });
+                    else {
+                        // REQUISITO 3: Cuando se inscribe, se le crean casilleros independientes automáticos para los 3 trimestres
+                        appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === curClassId).students.push({ 
+                            id: newId, name, code, 
+                            scores: {
+                                "1": { ser: "", saber: "", hacer: "", auto: "" },
+                                "2": { ser: "", saber: "", hacer: "", auto: "" },
+                                "3": { ser: "", saber: "", hacer: "", auto: "" }
+                            } 
+                        });
+                    }
+                }
+                saveData(); closeModal(); refreshCurrentView();
+            };
+        }
+
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        function editItem(type, id) { openModal(type, id); }
+        function deleteItem(type, id) {
+            if(!confirm("¿Eliminar elemento definitivamente?")) return;
+            if(type === 'inst') appData.institutions = appData.institutions.filter(i => i.id !== id);
+            else if(type === 'class') { const inst = appData.institutions.find(i => i.id === curInstId); inst.classrooms = inst.classrooms.filter(c => c.id !== id); }
+            else { const cls = appData.institutions.find(i => i.id === curInstId).classrooms.find(c => c.id === curClassId); cls.students = cls.students.filter(s => s.id !== id); }
+            saveData(); refreshCurrentView();
+        }
+
+        function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData)); const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `BACKUP_${new Date().getTime()}.json`); dl.click(); }
+        function importJSON() { document.getElementById('file-import').click(); }
+        function processFile(ev) { const file = ev.target.files[0]; const reader = new FileReader(); reader.onload = (e) => { try { appData = JSON.parse(e.target.result); saveData(); showSection('institutions'); } catch(err) { alert("Archivo inválido"); } }; reader.readAsText(file); }
+    </script>
+</body>
+</html>
