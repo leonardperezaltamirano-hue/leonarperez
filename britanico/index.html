@@ -3,489 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autoevaluación de Tecnología 🚀</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
-    
+    <title>Británico | Panel Institucional</title>
     <style>
         :root {
-            --primary: #FF4757;
-            --secondary: #2ED573;
-            --yellow: #FFA502;
-            --purple: #5352ED;
-            --dark: #2F3542;
-            --light-bg: #FFEAA7;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #2c3e50;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Quicksand', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--light-bg);
-            background-image: radial-gradient(#FF7F50 2px, transparent 2px);
-            background-size: 24px 24px;
-            color: var(--dark);
-            padding: 20px 10px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        .container {
-            max-width: 680px;
-            width: 100%;
-            background: white;
-            border-radius: 30px;
-            padding: 25px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-            border: 5px solid var(--purple);
-        }
-
-        .header {
+        header {
             text-align: center;
-            margin-bottom: 25px;
-            background: #FFF9E6;
-            padding: 20px;
-            border-radius: 22px;
-            border: 3px dashed var(--purple);
+            padding: 2.5rem 1rem 1.5rem 1rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .header h1 {
-            font-family: 'Fredoka One', cursive;
-            color: var(--purple);
-            font-size: 2.1rem;
-            margin-bottom: 5px;
+        .back-nav {
+            max-width: 800px;
+            margin: 0 auto 1rem auto;
+            text-align: left;
         }
 
-        .header p {
-            font-weight: 700;
-            color: #2D3436;
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-button:hover {
+            color: #004080;
+            text-decoration: underline;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #666;
             font-size: 1rem;
         }
 
-        .input-group {
-            margin-bottom: 25px;
-            background: #F8EFBA;
-            padding: 18px;
-            border-radius: 20px;
-            border: 3px solid var(--yellow);
-        }
-
-        .input-group label {
-            display: block;
-            font-family: 'Fredoka One', cursive;
-            margin-bottom: 10px;
-            color: #B33939;
-            font-size: 1.2rem;
-        }
-
-        .input-group input[type="text"] {
-            width: 100%;
-            padding: 14px 16px;
-            border: 3px solid var(--purple);
-            border-radius: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            outline: none;
-            background: #FFF;
-        }
-
-        .course-section {
-            margin-bottom: 25px;
-            background: #ECCC68;
-            padding: 20px;
-            border-radius: 22px;
-            border: 3px solid var(--yellow);
-        }
-
-        .course-title {
-            font-family: 'Fredoka One', cursive;
-            color: #2F3542;
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-        }
-
-        .course-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .course-card {
-            background: white;
-            border: 3px solid var(--purple);
-            border-radius: 16px;
-            padding: 12px 5px;
-            text-align: center;
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.15rem;
-            color: var(--purple);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 5px 0 var(--purple);
-            user-select: none;
-        }
-
-        .course-card:hover {
-            transform: translateY(-2px);
-            background-color: #F1F2F6;
-        }
-
-        .course-card.active {
-            background: var(--primary) !important;
-            color: white !important;
-            border-color: #2F3542 !important;
-            box-shadow: 0 5px 0 #2F3542 !important;
-            transform: scale(1.05);
-        }
-
-        .question-card {
-            background: #F1F2F6;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 3px solid #CED6E0;
-        }
-
-        .question-title {
-            font-weight: 700;
-            font-size: 1.05rem;
-            margin-bottom: 14px;
-            line-height: 1.4;
-            color: #2F3542;
-        }
-
-        .options-container {
-            display: flex;
-            gap: 10px;
-            justify-content: space-between;
-        }
-
-        .options-container input[type="radio"] {
-            display: none;
-        }
-
-        .options-container label {
+        main {
             flex: 1;
-            text-align: center;
-            padding: 12px 6px;
-            background: white;
-            border: 3px solid #A4B0BE;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .options-container label:hover {
-            background: #FFEAA7;
-        }
-
-        .options-container input[type="radio"]:checked + label {
-            background: var(--secondary);
-            color: white;
-            border-color: #2ED573;
-            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
-            transform: scale(1.03);
-        }
-
-        .btn-submit {
+            max-width: 800px;
             width: 100%;
-            background: var(--primary);
-            color: white;
-            border: 3px solid #2F3542;
-            padding: 16px;
-            border-radius: 20px;
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.4rem;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #2F3542;
-            transition: all 0.15s;
-            margin-top: 10px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
-        .btn-submit:hover {
-            background: #FF6B81;
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
-        .btn-submit:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #2F3542;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            justify-content: center;
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px 25px;
-            border-radius: 25px;
-            max-width: 450px;
-            width: 90%;
             text-align: center;
-            border: 5px solid var(--purple);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
         }
 
-        .modal-icon { font-size: 3.8rem; margin-bottom: 10px; }
-        .modal-title { font-family: 'Fredoka One', cursive; color: var(--purple); font-size: 1.7rem; margin-bottom: 10px; }
-        .modal-body { font-size: 1.15rem; color: #333; margin-bottom: 20px; line-height: 1.5; font-weight: 600; }
-
-        .btn-modal {
-            background: var(--secondary);
-            color: white;
-            border: 3px solid #2F3542;
-            padding: 12px 28px;
-            border-radius: 15px;
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #2F3542;
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
         }
 
-        @media (max-width: 480px) {
-            .options-container { flex-direction: column; }
+        .card h2 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            font-size: 0.85rem;
+            color: #888;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>🌟 Autoevaluación de Tecnología 🌟</h1>
-        <p>¡Lee detenidamente cada pregunta y marca sinceramente tu respuesta!</p>
-    </div>
-
-    <!-- Iframe invisible para procesar la petición sin salir de la página -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){onSuccess();}"></iframe>
-
-    <!-- FORMULARIO APUNTANDO A TU NUEVO EXEC -->
-    <form id="evaluationForm" action="https://script.google.com/macros/s/AKfycby1uPN7Ngj11QWsOkR2dqalJchJwEgtwZ_6Kmw39kHyK4xoVSjWhy2DlkqwLumBbO7l-g/exec" method="POST" target="hidden_iframe">
-        
-        <div class="input-group">
-            <label for="studentName">👤 Apellidos y Nombres:</label>
-            <input type="text" id="studentName" name="estudiante" required placeholder="Escribe aquí tu nombre completo...">
+    <header>
+        <div class="back-nav">
+            <a href="../index.html" class="back-button">← Volver al Portal Principal</a>
         </div>
+        <h1>Británico</h1>
+        <p>Selecciona el módulo al que deseas acceder</p>
+    </header>
 
-        <div class="course-section">
-            <div class="course-title">🏫 Selecciona tu Curso:</div>
-            
-            <select name="curso" id="real_course_select" required style="display:none;">
-                <option value="">-- Seleccionar --</option>
-                <option value="P1A">P1A</option>
-                <option value="P1B">P1B</option>
-                <option value="P1C">P1C</option>
-                <option value="P2A">P2A</option>
-                <option value="P2B">P2B</option>
-                <option value="P2C">P2C</option>
-                <option value="P3A">P3A</option>
-                <option value="P3B">P3B</option>
-                <option value="P3C">P3C</option>
-            </select>
+    <main>
+        <div class="cards-container">
+            <!-- Botón 1: Autoevaluaciones -->
+            <a href="./autoevaluaciones/index.html" class="card">
+                <div class="card-icon">📝</div>
+                <h2>Autoevaluaciones</h2>
+            </a>
 
-            <div class="course-grid">
-                <div class="course-card" onclick="setCourse('P1A', this)">🎈 P1A</div>
-                <div class="course-card" onclick="setCourse('P1B', this)">🎈 P1B</div>
-                <div class="course-card" onclick="setCourse('P1C', this)">🎈 P1C</div>
-                
-                <div class="course-card" onclick="setCourse('P2A', this)">🚀 P2A</div>
-                <div class="course-card" onclick="setCourse('P2B', this)">🚀 P2B</div>
-                <div class="course-card" onclick="setCourse('P2C', this)">🚀 P2C</div>
-                
-                <div class="course-card" onclick="setCourse('P3A', this)">⭐ P3A</div>
-                <div class="course-card" onclick="setCourse('P3B', this)">⭐ P3B</div>
-                <div class="course-card" onclick="setCourse('P3C', this)">⭐ P3C</div>
-            </div>
+            <!-- Botón 2: Sistema Académico -->
+            <a href="./sistemaacademico/index.html" class="card">
+                <div class="card-icon">🎓</div>
+                <h2>Sistema Académico</h2>
+            </a>
         </div>
+    </main>
 
-        <input type="hidden" name="p1_texto" id="p1_texto">
-        <input type="hidden" name="p1_puntos" id="p1_puntos">
-        <input type="hidden" name="p2_texto" id="p2_texto">
-        <input type="hidden" name="p2_puntos" id="p2_puntos">
-        <input type="hidden" name="p3_texto" id="p3_texto">
-        <input type="hidden" name="p3_puntos" id="p3_puntos">
-        <input type="hidden" name="p4_texto" id="p4_texto">
-        <input type="hidden" name="p4_puntos" id="p4_puntos">
-        <input type="hidden" name="p5_texto" id="p5_texto">
-        <input type="hidden" name="p5_puntos" id="p5_puntos">
-        <input type="hidden" name="suma_puntos" id="suma_puntos">
-        <input type="hidden" name="nota_final" id="nota_final">
-
-        <div class="question-card">
-            <p class="question-title">1. Comprendo la importancia de utilizar herramientas digitales y tecnológicas de forma responsable durante las clases.</p>
-            <div class="options-container">
-                <input type="radio" id="p1_siempre" name="p1_radio" value="Siempre" data-score="2" required>
-                <label for="p1_siempre">😊 Siempre</label>
-
-                <input type="radio" id="p1_aveces" name="p1_radio" value="A veces" data-score="1">
-                <label for="p1_aveces">😐 A veces</label>
-
-                <input type="radio" id="p1_nunca" name="p1_radio" value="Nunca" data-score="0">
-                <label for="p1_nunca">🙁 Nunca</label>
-            </div>
-        </div>
-
-        <div class="question-card">
-            <p class="question-title">2. Me esfuerzo cada día por ser más responsable en la administración de mi tiempo, entregando puntualmente mis trabajos de Tecnología.</p>
-            <div class="options-container">
-                <input type="radio" id="p2_siempre" name="p2_radio" value="Siempre" data-score="2" required>
-                <label for="p2_siempre">😊 Siempre</label>
-
-                <input type="radio" id="p2_aveces" name="p2_radio" value="A veces" data-score="1">
-                <label for="p2_aveces">😐 A veces</label>
-
-                <input type="radio" id="p2_nunca" name="p2_radio" value="Nunca" data-score="0">
-                <label for="p2_nunca">🙁 Nunca</label>
-            </div>
-        </div>
-
-        <div class="question-card">
-            <p class="question-title">3. Respeto a mi docente de Tecnología y sigo con atención las instrucciones para el desarrollo de actividades prácticas.</p>
-            <div class="options-container">
-                <input type="radio" id="p3_siempre" name="p3_radio" value="Siempre" data-score="2" required>
-                <label for="p3_siempre">😊 Siempre</label>
-
-                <input type="radio" id="p3_aveces" name="p3_radio" value="A veces" data-score="1">
-                <label for="p3_aveces">😐 A veces</label>
-
-                <input type="radio" id="p3_nunca" name="p3_radio" value="Nunca" data-score="0">
-                <label for="p3_nunca">🙁 Nunca</label>
-            </div>
-        </div>
-
-        <div class="question-card">
-            <p class="question-title">4. Colaboro con mis compañeros de forma respetuosa y tolerante durante los trabajos en equipo, evitando conflictos y malos entendidos.</p>
-            <div class="options-container">
-                <input type="radio" id="p4_siempre" name="p4_radio" value="Siempre" data-score="2" required>
-                <label for="p4_siempre">😊 Siempre</label>
-
-                <input type="radio" id="p4_aveces" name="p4_radio" value="A veces" data-score="1">
-                <label for="p4_aveces">😐 A veces</label>
-
-                <input type="radio" id="p4_nunca" name="p4_radio" value="Nunca" data-score="0">
-                <label for="p4_nunca">🙁 Nunca</label>
-            </div>
-        </div>
-
-        <div class="question-card">
-            <p class="question-title">5. Cuido los equipos tecnológicos (computadoras, tablets, dispositivos) y el entorno del aula de Tecnología, manteniéndolos limpios y en buen estado.</p>
-            <div class="options-container">
-                <input type="radio" id="p5_siempre" name="p5_radio" value="Siempre" data-score="2" required>
-                <label for="p5_siempre">😊 Siempre</label>
-
-                <input type="radio" id="p5_aveces" name="p5_radio" value="A veces" data-score="1">
-                <label for="p5_aveces">😐 A veces</label>
-
-                <input type="radio" id="p5_nunca" name="p5_radio" value="Nunca" data-score="0">
-                <label for="p5_nunca">🙁 Nunca</label>
-            </div>
-        </div>
-
-        <button type="submit" id="btnSubmit" class="btn-submit">🚀 ENVIAR AUTOEVALUACIÓN</button>
-    </form>
-</div>
-
-<div id="customModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-icon">📩</div>
-        <h2 class="modal-title">¡Autoevaluación Enviada!</h2>
-        <div class="modal-body" id="modalMessage"></div>
-        <button class="btn-modal" onclick="closeModal()">Aceptar / Continuar</button>
-    </div>
-</div>
-
-<script>
-    let submitted = false;
-    let savedNombre = '';
-    let savedCurso = '';
-
-    function setCourse(code, cardElement) {
-        document.getElementById('real_course_select').value = code;
-        savedCurso = code;
-
-        document.querySelectorAll('.course-card').forEach(card => {
-            card.classList.remove('active');
-        });
-
-        cardElement.classList.add('active');
-    }
-
-    document.getElementById('evaluationForm').addEventListener('submit', function(e) {
-        const courseVal = document.getElementById('real_course_select').value;
-        if (!courseVal) {
-            e.preventDefault();
-            alert('⚠️ ¡Por favor selecciona tu curso antes de enviar!');
-            return false;
-        }
-
-        let totalPuntos = 0;
-
-        for (let i = 1; i <= 5; i++) {
-            const selectedOption = document.querySelector(`input[name="p${i}_radio"]:checked`);
-            if (selectedOption) {
-                const texto = selectedOption.value;
-                const score = parseInt(selectedOption.getAttribute('data-score'));
-
-                document.getElementById(`p${i}_texto`).value = texto;
-                document.getElementById(`p${i}_puntos`).value = score;
-                totalPuntos += score;
-            }
-        }
-
-        const notaFinalEntera = Math.round(totalPuntos / 2);
-        
-        document.getElementById('suma_puntos').value = Math.round(totalPuntos);
-        document.getElementById('nota_final').value = notaFinalEntera;
-
-        savedNombre = document.getElementById('studentName').value;
-        submitted = true;
-        
-        const btn = document.getElementById('btnSubmit');
-        btn.disabled = true;
-        btn.innerText = 'Enviando respuestas... ⏳';
-    });
-
-    function onSuccess() {
-        if (submitted) {
-            document.getElementById('modalMessage').innerHTML = `¡Muchas gracias, <strong>${savedNombre}</strong> (${savedCurso})!<br><br>Tu autoevaluación ha sido guardada con éxito.`;
-            document.getElementById('customModal').style.display = 'flex';
-            
-            document.getElementById('evaluationForm').reset();
-            document.querySelectorAll('.course-card').forEach(card => card.classList.remove('active'));
-            
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = false;
-            btn.innerText = '🚀 ENVIAR AUTOEVALUACIÓN';
-            
-            submitted = false;
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('customModal').style.display = 'none';
-    }
-</script>
+    <footer>
+        <p>leonarperezaltamirano derechos reservados</p>
+    </footer>
 
 </body>
 </html>
